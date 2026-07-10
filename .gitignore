@@ -1,0 +1,17 @@
+# Node
+node_modules/
+
+# Python
+.venv/
+__pycache__/
+
+# Environment files
+backend/.env
+python-analytics/.env
+frontend/.env.local
+
+# Next.js
+.next/
+
+# Logs
+*.log
