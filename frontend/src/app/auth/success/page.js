@@ -16,7 +16,7 @@ function AuthSuccessContent() {
     const user = searchParams.get("user");
 
     if (!token || !user) {
-      router.push("/login");
+      router.push("/");
       return;
     }
 
@@ -41,7 +41,7 @@ function AuthSuccessContent() {
       router.push("/dashboard");
     } catch (error) {
       console.error("Failed to process login:", error);
-      router.push("/login");
+      router.push("/");
     }
   }, [dispatch, router, searchParams]);
 
