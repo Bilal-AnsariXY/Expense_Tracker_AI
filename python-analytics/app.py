@@ -1,3 +1,4 @@
+import os
 from flask import Flask, jsonify, g, request
 from flask_cors import CORS
 
@@ -18,7 +19,7 @@ from ai import ask_ai
 app = Flask(__name__)
 CORS(
     app,
-    origins=["http://localhost:3000"],
+    origins=[os.getenv("FRONTEND_URL", "http://localhost:3000")],
     allow_headers=["Content-Type", "Authorization"],
     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 )
@@ -202,10 +203,11 @@ def ai_chat():
 # ==========================================
 # RUN APP
 # ==========================================
-
 if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5001))
 
     app.run(
-        debug=True,
-        port=5001
+        host="0.0.0.0",
+        port=port,
+        debug=False
     )
