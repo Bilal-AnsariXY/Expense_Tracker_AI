@@ -91,7 +91,7 @@ export default function IncomePage() {
   );
 
   if (loading) {
-    return <div className="p-8 text-xl font-semibold">Loading Income...</div>;
+    return <div className="p-8 text-xl text-black font-semibold">Loading Income...</div>;
   }
 
   if (error) {

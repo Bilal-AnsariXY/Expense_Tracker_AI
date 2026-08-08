@@ -80,13 +80,13 @@ const handleLogout = () => {
             <p className="text-sm text-gray-500">Welcome Back</p>
 
             <h3 className="font-semibold text-gray-800">
-              {user?.Name || "User"}
+              {user?.name || "User"}
             </h3>
           </div>
 
           <img
             src={
-              user?.ProfilePicture || "https://ui-avatars.com/api/?name=User"
+              user?.profilepicture || "https://ui-avatars.com/api/?name=User"
             }
             alt="Profile"
             className="h-12 w-12 rounded-full border-2 border-gray-300"
@@ -96,9 +96,9 @@ const handleLogout = () => {
         {open && (
           <div className="absolute right-0 mt-3 w-64 rounded-2xl border bg-white p-3 shadow-xl">
             <div className="border-b pb-3">
-              <p className="font-semibold text-gray-800">{user?.Name}</p>
+              <p className="font-semibold text-gray-800">{user?.name}</p>
 
-              <p className="text-sm text-gray-500">{user?.Email}</p>
+              <p className="text-sm text-gray-500">{user?.email}</p>
             </div>
 
             <div className="mt-3 space-y-2">

@@ -24,7 +24,7 @@ export default function AIInsights() {
       <div className="rounded-3xl bg-white p-8 shadow-md">
         <h2 className="mb-6 text-2xl font-bold">🤖 AI Financial Advisor</h2>
 
-        <p>Loading Insights...</p>
+        <p className="text-black">Loading Insights...</p>
       </div>
     );
   }

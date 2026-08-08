@@ -26,6 +26,7 @@ export default function DashboardPage() {
   const { summary, category, monthly, loading, error } = useSelector(
     (state) => state.dashboard,
   );
+  console.log("CATEGORY FROM REDUX:", category);
 
   useEffect(() => {
     loadDashboard();
@@ -52,7 +53,7 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="p-8 text-xl font-semibold">Loading Dashboard...</div>
+      <div className="p-8 text-xl text-black font-semibold">Loading Dashboard...</div>
     );
   }
 

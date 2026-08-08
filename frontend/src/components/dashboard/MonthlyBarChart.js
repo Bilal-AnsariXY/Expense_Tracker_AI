@@ -11,18 +11,23 @@ import {
 } from "recharts";
 
 export default function MonthlyBarChart({ data = [] }) {
-  return (
-    <div className="rounded-3xl bg-white p-6 shadow-md">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Monthly Expenses</h2>
+  const chartData = data.map((item) => ({
+    name: item.monthname,
+    value: Number(item.totalexpense),
+  }));
 
-        <p className="text-gray-500">Expense amount month by month</p>
-      </div>
+  console.log("MONTHLY CHART DATA:", chartData);
+
+  return (
+    <div className="rounded-2xl bg-white p-6 shadow">
+      <h2 className="text-2xl font-bold text-gray-800">Monthly Expenses</h2>
+
+      <p className="text-gray-500">Expense amount month by month</p>
 
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
-            data={data}
+            data={chartData}
             margin={{
               top: 10,
               right: 20,
@@ -32,7 +37,7 @@ export default function MonthlyBarChart({ data = [] }) {
           >
             <CartesianGrid strokeDasharray="3 3" />
 
-            <XAxis dataKey="MonthName" />
+            <XAxis dataKey="name" />
 
             <YAxis />
 
@@ -40,11 +45,7 @@ export default function MonthlyBarChart({ data = [] }) {
               formatter={(value) => `₹${Number(value).toLocaleString()}`}
             />
 
-            <Bar
-              dataKey="TotalExpense"
-              fill="#2563eb"
-              radius={[10, 10, 0, 0]}
-            />
+            <Bar dataKey="value" fill="#2563eb" radius={[10, 10, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

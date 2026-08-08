@@ -1,160 +1,149 @@
 import pandas as pd
-
 from database import get_connection
-
 
 # ==========================================
 # GET ALL EXPENSES
 # ==========================================
+
 def get_expenses(user_id):
 
     connection = get_connection()
 
     query = """
         SELECT
-            e.ExpenseId,
-            e.UserId,
-            e.CategoryId,
-            c.CategoryName,
-            e.Amount,
-            e.Description,
-            e.ExpenseDate,
-            e.CreatedAt
-        FROM Expenses e
-        INNER JOIN Categories c
-            ON e.CategoryId = c.CategoryId
-        WHERE e.UserId = ?
+            e.expenseid,
+            e.userid,
+            e.categoryid,
+            c.categoryname,
+            e.amount,
+            e.description,
+            e.expensedate,
+            e.createdat
+        FROM expenses e
+        INNER JOIN categories c
+            ON e.categoryid = c.categoryid
+        WHERE e.userid = %s
     """
 
-    dataframe = pd.read_sql(
-        query,
-        connection,
-        params=[user_id]
-    )
+    cursor = connection.cursor()
+
+    cursor.execute(query, (user_id,))
+
+    rows = cursor.fetchall()
 
     connection.close()
 
+    dataframe = pd.DataFrame(rows)
+
     return dataframe
+
+
 
 
 # ==========================================
 # GET ALL INCOME
 # ==========================================
+
 def get_income(user_id):
 
     connection = get_connection()
 
     query = """
         SELECT
-            i.IncomeId,
-            i.UserId,
-            i.CategoryId,
-            c.CategoryName,
-            i.Amount,
-            i.Description,
-            i.IncomeDate,
-            i.CreatedAt
-        FROM Income i
-        INNER JOIN Categories c
-            ON i.CategoryId = c.CategoryId
-        WHERE i.UserId = ?
+            i.incomeid,
+            i.userid,
+            i.categoryid,
+            c.categoryname,
+            i.amount,
+            i.description,
+            i.incomedate,
+            i.createdat
+        FROM income i
+        INNER JOIN categories c
+            ON i.categoryid = c.categoryid
+        WHERE i.userid = %s
     """
 
-    dataframe = pd.read_sql(
-        query,
-        connection,
-        params=[user_id]
-    )
+    cursor = connection.cursor()
+
+    cursor.execute(query, (user_id,))
+
+    rows = cursor.fetchall()
 
     connection.close()
 
-    return dataframe
+    dataframe = pd.DataFrame(rows)
 
+    return dataframe
 
 # ==========================================
 # DASHBOARD SUMMARY
 # ==========================================
+
 def get_summary(user_id):
 
     expenses = get_expenses(user_id)
     income = get_income(user_id)
 
     total_expense = (
-        float(expenses["Amount"].sum())
+        float(expenses["amount"].sum())
         if not expenses.empty
         else 0
     )
 
     total_income = (
-        float(income["Amount"].sum())
+        float(income["amount"].sum())
         if not income.empty
         else 0
     )
 
     average_expense = (
-        float(expenses["Amount"].mean())
+        float(expenses["amount"].mean())
         if not expenses.empty
         else 0
     )
 
     highest_expense = (
-        float(expenses["Amount"].max())
+        float(expenses["amount"].max())
         if not expenses.empty
         else 0
     )
 
     lowest_expense = (
-        float(expenses["Amount"].min())
+        float(expenses["amount"].min())
         if not expenses.empty
         else 0
     )
 
-    summary = {
-
+    return {
         "totalIncome": total_income,
-
         "totalExpense": total_expense,
-
         "balance": total_income - total_expense,
-
         "averageExpense": average_expense,
-
         "highestExpense": highest_expense,
-
         "lowestExpense": lowest_expense,
-
         "totalExpenseTransactions": int(expenses.shape[0]),
-
-        "totalIncomeTransactions": int(income.shape[0])
-
+        "totalIncomeTransactions": int(income.shape[0]),
     }
-
-    return summary
 
 
 # ==========================================
 # CATEGORY SUMMARY
 # ==========================================
+
 def get_category_summary(user_id):
 
     expenses = get_expenses(user_id)
 
     if expenses.empty:
-
         return []
 
     category_summary = (
-
         expenses
-
-        .groupby("CategoryName")["Amount"]
-
+        .groupby("categoryname")["amount"]
         .sum()
-
         .reset_index()
-
-        .sort_values(by="Amount", ascending=False)
-
+        .sort_values(by="amount", ascending=False)
     )
 
     return category_summary.to_dict(orient="records")
@@ -163,6 +152,7 @@ def get_category_summary(user_id):
 # ==========================================
 # MONTHLY SUMMARY
 # ==========================================
+
 def get_monthly_summary(user_id):
 
     expenses = get_expenses(user_id)
@@ -170,11 +160,11 @@ def get_monthly_summary(user_id):
     if expenses.empty:
         return []
 
-    expenses["ExpenseDate"] = pd.to_datetime(expenses["ExpenseDate"])
+    expenses["expensedate"] = pd.to_datetime(expenses["expensedate"])
 
     monthly = (
         expenses
-        .groupby(expenses["ExpenseDate"].dt.strftime("%B"))["Amount"]
+        .groupby(expenses["expensedate"].dt.strftime("%B"))["amount"]
         .sum()
         .reset_index()
     )
@@ -187,50 +177,47 @@ def get_monthly_summary(user_id):
 # ==========================================
 # INCOME VS EXPENSE
 # ==========================================
+
 def get_income_vs_expense(user_id):
 
     expenses = get_expenses(user_id)
     income = get_income(user_id)
 
     total_income = (
-        float(income["Amount"].sum())
+        float(income["amount"].sum())
         if not income.empty
         else 0
     )
 
     total_expense = (
-        float(expenses["Amount"].sum())
+        float(expenses["amount"].sum())
         if not expenses.empty
         else 0
     )
 
     return {
-
         "totalIncome": total_income,
-
         "totalExpense": total_expense,
-
         "balance": total_income - total_expense
-
     }
-
 
 # ==========================================
 # SAVINGS
 # ==========================================
+
 def get_savings(user_id):
 
     expenses = get_expenses(user_id)
     income = get_income(user_id)
 
     total_income = (
-        float(income["Amount"].sum())
+        float(income["amount"].sum())
         if not income.empty
         else 0
     )
 
     total_expense = (
-        float(expenses["Amount"].sum())
+        float(expenses["amount"].sum())
         if not expenses.empty
         else 0
     )
@@ -240,30 +227,20 @@ def get_savings(user_id):
     saving_percentage = 0
 
     if total_income > 0:
-
-        saving_percentage = (
-            savings / total_income
-        ) * 100
+        saving_percentage = (savings / total_income) * 100
 
     return {
-
         "Income": total_income,
-
         "Expense": total_expense,
-
         "Savings": savings,
-
-        "SavingPercentage": round(
-            saving_percentage,
-            2
-        )
-
+        "SavingPercentage": round(saving_percentage, 2)
     }
 
 
 # ==========================================
 # TOP 5 EXPENSES
 # ==========================================
+
 def get_top_expenses(user_id):
 
     expenses = get_expenses(user_id)
@@ -272,26 +249,21 @@ def get_top_expenses(user_id):
         return []
 
     top = (
-
         expenses
-
         .sort_values(
-            by="Amount",
+            by="amount",
             ascending=False
         )
-
         .head(5)
-
     )
 
-    return top.to_dict(
-        orient="records"
-    )
+    return top.to_dict(orient="records")
 
 
 # ==========================================
 # AI INSIGHTS
 # ==========================================
+
 def get_ai_insights(user_id):
 
     expenses = get_expenses(user_id)
@@ -299,25 +271,16 @@ def get_ai_insights(user_id):
     if expenses.empty:
 
         return {
-
             "highestCategory": None,
-
             "highestExpense": 0,
-
             "averageExpense": 0,
-
             "suggestion": "No expense data found."
-
         }
 
     category = (
-
         expenses
-
-        .groupby("CategoryName")["Amount"]
-
+        .groupby("categoryname")["amount"]
         .sum()
-
     )
 
     highest_category = category.idxmax()
@@ -325,17 +288,12 @@ def get_ai_insights(user_id):
     highest_amount = float(category.max())
 
     average = float(
-        expenses["Amount"].mean()
+        expenses["amount"].mean()
     )
 
     return {
-
         "highestCategory": highest_category,
-
         "highestExpense": highest_amount,
-
         "averageExpense": average,
-
         "suggestion": f"Try reducing spending on {highest_category} to save more money."
-
     }

@@ -91,7 +91,7 @@ export default function ExpensesPage() {
   );
 
   if (loading) {
-    return <div className="p-8 text-xl font-semibold">Loading Expenses...</div>;
+    return <div className="p-8 text-xl text-black font-semibold">Loading Expenses...</div>;
   }
 
   if (error) {

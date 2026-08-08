@@ -6,7 +6,7 @@ export default function TopCategories() {
   const { category } = useSelector((state) => state.dashboard);
 
   return (
-    <div className="rounded-3xl bg-white p-6 shadow-md">
+    <div className="rounded-2xl bg-white p-6 shadow">
       <h2 className="mb-6 text-2xl font-bold text-gray-800">Top Categories</h2>
 
       {category.length === 0 ? (
@@ -15,15 +15,15 @@ export default function TopCategories() {
         <div className="space-y-4">
           {category.map((item) => (
             <div
-              key={item.CategoryName}
+              key={item.categoryname}
               className="flex items-center justify-between rounded-xl border border-gray-200 p-4 transition hover:bg-gray-50"
             >
               <span className="font-semibold text-gray-800">
-                {item.CategoryName}
+                {item.categoryname}
               </span>
 
               <span className="font-bold text-blue-600">
-                ₹{Number(item.TotalExpense).toLocaleString()}
+                ₹{Number(item.totalexpense).toLocaleString()}
               </span>
             </div>
           ))}

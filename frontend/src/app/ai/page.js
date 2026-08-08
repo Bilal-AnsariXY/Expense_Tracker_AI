@@ -112,7 +112,7 @@ export default function AIPage() {
       {/* AI INSIGHTS */}
 
       <div className="rounded-2xl bg-white p-6 shadow">
-        <h2 className="mb-6 text-2xl font-bold">AI Insights</h2>
+        <h2 className="mb-6 text-2xl text-black font-bold">AI Insights</h2>
 
         {insights ? (
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -149,7 +149,7 @@ export default function AIPage() {
             </div>
           </div>
         ) : (
-          <p>No insights available.</p>
+          <p className="text-gray-500">No insights available.</p>
         )}
       </div>
 

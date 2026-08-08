@@ -1,31 +1,31 @@
-const { sql } = require("../config/db");
+const { pool } = require("../config/db");
 
+// GET ALL EXPENSES
 const getAllExpenses = async (req, res) => {
   try {
     const userId = req.user.userId;
 
-    const request = new sql.Request();
+    const result = await pool.query(
+      `
+      SELECT
+        e.expenseid,
+        e.userid,
+        e.categoryid,
+        c.categoryname,
+        e.amount,
+        e.description,
+        e.expensedate,
+        e.createdat
+      FROM expenses e
+      INNER JOIN categories c
+        ON e.categoryid = c.categoryid
+      WHERE e.userid = $1
+      ORDER BY e.expensedate DESC
+      `,
+      [userId],
+    );
 
-    request.input("UserId", sql.Int, userId);
-
-    const result = await request.query(`
-     SELECT
-          e.ExpenseId,
-          e.UserId,
-          e.CategoryId,
-          c.CategoryName,
-          e.Amount,
-          e.Description,
-          e.ExpenseDate,
-          e.CreatedAt
-      FROM Expenses e
-      INNER JOIN Categories c
-          ON e.CategoryId = c.CategoryId
-      WHERE e.UserId = @UserId
-      ORDER BY e.ExpenseDate DESC;
-    `);
-      console.log("get all expence ")
-    res.status(200).json(result.recordset);
+    res.status(200).json(result.rows);
   } catch (error) {
     console.error(error);
 
@@ -36,40 +36,34 @@ const getAllExpenses = async (req, res) => {
   }
 };
 
+// CREATE EXPENSE
 const createExpense = async (req, res) => {
   try {
-    // Get the logged-in user's ID from the JWT
     const userId = req.user.userId;
 
-    // Get the remaining data from the request body
     const { CategoryId, Amount, Description, ExpenseDate } = req.body;
 
-    const request = new sql.Request();
-
-    request.input("UserId", sql.Int, userId);
-    request.input("CategoryId", sql.Int, CategoryId);
-    request.input("Amount", sql.Decimal(10, 2), Amount);
-    request.input("Description", sql.NVarChar(255), Description);
-    request.input("ExpenseDate", sql.Date, ExpenseDate);
-
-    await request.query(`
-      INSERT INTO Expenses
+    await pool.query(
+      `
+      INSERT INTO expenses
       (
-        UserId,
-        CategoryId,
-        Amount,
-        Description,
-        ExpenseDate
+        userid,
+        categoryid,
+        amount,
+        description,
+        expensedate
       )
       VALUES
       (
-        @UserId,
-        @CategoryId,
-        @Amount,
-        @Description,
-        @ExpenseDate
+        $1,
+        $2,
+        $3,
+        $4,
+        $5
       )
-    `);
+      `,
+      [userId, CategoryId, Amount, Description, ExpenseDate],
+    );
 
     res.status(201).json({
       success: true,
@@ -85,31 +79,30 @@ const createExpense = async (req, res) => {
   }
 };
 
+// GET EXPENSE BY ID
 const getExpenseById = async (req, res) => {
   try {
     const userId = req.user.userId;
     const expenseId = req.params.id;
 
-    const request = new sql.Request();
-
-    request.input("ExpenseId", sql.Int, expenseId);
-    request.input("UserId", sql.Int, userId);
-
-    const result = await request.query(`
+    const result = await pool.query(
+      `
       SELECT *
-      FROM Expenses
-      WHERE ExpenseId = @ExpenseId
-      AND UserId = @UserId
-    `);
+      FROM expenses
+      WHERE expenseid = $1
+      AND userid = $2
+      `,
+      [expenseId, userId],
+    );
 
-    if (result.recordset.length === 0) {
+    if (result.rows.length === 0) {
       return res.status(404).json({
         success: false,
         message: "Expense Not Found",
       });
     }
 
-    res.status(200).json(result.recordset[0]);
+    res.status(200).json(result.rows[0]);
   } catch (error) {
     console.error(error);
 
@@ -120,7 +113,7 @@ const getExpenseById = async (req, res) => {
   }
 };
 
-
+// UPDATE EXPENSE
 const updateExpense = async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -128,27 +121,21 @@ const updateExpense = async (req, res) => {
 
     const { CategoryId, Amount, Description, ExpenseDate } = req.body;
 
-    const request = new sql.Request();
-
-    request.input("ExpenseId", sql.Int, expenseId);
-    request.input("UserId", sql.Int, userId);
-    request.input("CategoryId", sql.Int, CategoryId);
-    request.input("Amount", sql.Decimal(10, 2), Amount);
-    request.input("Description", sql.NVarChar(255), Description);
-    request.input("ExpenseDate", sql.Date, ExpenseDate);
-
-    const result = await request.query(`
-      UPDATE Expenses
+    const result = await pool.query(
+      `
+      UPDATE expenses
       SET
-        CategoryId = @CategoryId,
-        Amount = @Amount,
-        Description = @Description,
-        ExpenseDate = @ExpenseDate
-      WHERE ExpenseId = @ExpenseId
-      AND UserId = @UserId
-    `);
+        categoryid = $1,
+        amount = $2,
+        description = $3,
+        expensedate = $4
+      WHERE expenseid = $5
+      AND userid = $6
+      `,
+      [CategoryId, Amount, Description, ExpenseDate, expenseId, userId],
+    );
 
-    if (result.rowsAffected[0] === 0) {
+    if (result.rowCount === 0) {
       return res.status(404).json({
         success: false,
         message: "Expense Not Found",
@@ -169,23 +156,22 @@ const updateExpense = async (req, res) => {
   }
 };
 
+// DELETE EXPENSE
 const deleteExpense = async (req, res) => {
   try {
     const userId = req.user.userId;
     const expenseId = req.params.id;
 
-    const request = new sql.Request();
+    const result = await pool.query(
+      `
+      DELETE FROM expenses
+      WHERE expenseid = $1
+      AND userid = $2
+      `,
+      [expenseId, userId],
+    );
 
-    request.input("ExpenseId", sql.Int, expenseId);
-    request.input("UserId", sql.Int, userId);
-
-    const result = await request.query(`
-      DELETE FROM Expenses
-      WHERE ExpenseId = @ExpenseId
-      AND UserId = @UserId
-    `);
-
-    if (result.rowsAffected[0] === 0) {
+    if (result.rowCount === 0) {
       return res.status(404).json({
         success: false,
         message: "Expense Not Found",
@@ -205,12 +191,11 @@ const deleteExpense = async (req, res) => {
     });
   }
 };
+
 module.exports = {
   getAllExpenses,
   createExpense,
   getExpenseById,
   updateExpense,
   deleteExpense,
-
 };
-

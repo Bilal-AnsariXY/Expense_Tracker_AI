@@ -1,32 +1,33 @@
-const { sql } = require("../config/db");
+const { pool } = require("../config/db");
 
+// =========================
 // GET ALL INCOME
+// =========================
 const getAllIncome = async (req, res) => {
   try {
     const userId = req.user.userId;
 
-    const request = new sql.Request();
-
-    request.input("UserId", sql.Int, userId);
-
-    const result = await request.query(`
+    const result = await pool.query(
+      `
       SELECT
-    I.IncomeId,
-    I.UserId,
-    I.CategoryId,
-    C.CategoryName,
-    I.Amount,
-    I.Description,
-    I.IncomeDate,
-    I.CreatedAt
-FROM Income I
-LEFT JOIN Categories C
-ON I.CategoryId = C.CategoryId
-WHERE I.UserId = @UserId
-ORDER BY I.IncomeDate DESC;
-    `);
+        i.incomeid,
+        i.userid,
+        i.categoryid,
+        c.categoryname,
+        i.amount,
+        i.description,
+        i.incomedate,
+        i.createdat
+      FROM income i
+      LEFT JOIN categories c
+        ON i.categoryid = c.categoryid
+      WHERE i.userid = $1
+      ORDER BY i.incomedate DESC
+      `,
+      [userId],
+    );
 
-    res.status(200).json(result.recordset);
+    res.status(200).json(result.rows);
   } catch (error) {
     console.error(error);
 
@@ -37,32 +38,32 @@ ORDER BY I.IncomeDate DESC;
   }
 };
 
+// =========================
 // GET INCOME BY ID
+// =========================
 const getIncomeById = async (req, res) => {
   try {
     const userId = req.user.userId;
     const incomeId = req.params.id;
 
-    const request = new sql.Request();
-
-    request.input("IncomeId", sql.Int, incomeId);
-    request.input("UserId", sql.Int, userId);
-
-    const result = await request.query(`
+    const result = await pool.query(
+      `
       SELECT *
-      FROM Income
-      WHERE IncomeId = @IncomeId
-      AND UserId = @UserId
-    `);
+      FROM income
+      WHERE incomeid = $1
+        AND userid = $2
+      `,
+      [incomeId, userId],
+    );
 
-    if (result.recordset.length === 0) {
+    if (result.rows.length === 0) {
       return res.status(404).json({
         success: false,
         message: "Income Not Found",
       });
     }
 
-    res.status(200).json(result.recordset[0]);
+    res.status(200).json(result.rows[0]);
   } catch (error) {
     console.error(error);
 
@@ -73,39 +74,36 @@ const getIncomeById = async (req, res) => {
   }
 };
 
+// =========================
 // CREATE INCOME
+// =========================
 const createIncome = async (req, res) => {
   try {
     const userId = req.user.userId;
 
     const { CategoryId, Amount, Description, IncomeDate } = req.body;
 
-    const request = new sql.Request();
-
-    request.input("UserId", sql.Int, userId);
-    request.input("CategoryId", sql.Int, CategoryId);
-    request.input("Amount", sql.Decimal(10, 2), Amount);
-    request.input("Description", sql.NVarChar(255), Description);
-    request.input("IncomeDate", sql.Date, IncomeDate);
-
-    await request.query(`
-      INSERT INTO Income
+    await pool.query(
+      `
+      INSERT INTO income
       (
-        UserId,
-        CategoryId,
-        Amount,
-        Description,
-        IncomeDate
+        userid,
+        categoryid,
+        amount,
+        description,
+        incomedate
       )
       VALUES
       (
-        @UserId,
-        @CategoryId,
-        @Amount,
-        @Description,
-        @IncomeDate
+        $1,
+        $2,
+        $3,
+        $4,
+        $5
       )
-    `);
+      `,
+      [userId, CategoryId, Amount, Description, IncomeDate],
+    );
 
     res.status(201).json({
       success: true,
@@ -121,7 +119,9 @@ const createIncome = async (req, res) => {
   }
 };
 
+// =========================
 // UPDATE INCOME
+// =========================
 const updateIncome = async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -129,27 +129,21 @@ const updateIncome = async (req, res) => {
 
     const { CategoryId, Amount, Description, IncomeDate } = req.body;
 
-    const request = new sql.Request();
-
-    request.input("IncomeId", sql.Int, incomeId);
-    request.input("UserId", sql.Int, userId);
-    request.input("CategoryId", sql.Int, CategoryId);
-    request.input("Amount", sql.Decimal(10, 2), Amount);
-    request.input("Description", sql.NVarChar(255), Description);
-    request.input("IncomeDate", sql.Date, IncomeDate);
-
-    const result = await request.query(`
-      UPDATE Income
+    const result = await pool.query(
+      `
+      UPDATE income
       SET
-        CategoryId = @CategoryId,
-        Amount = @Amount,
-        Description = @Description,
-        IncomeDate = @IncomeDate
-      WHERE IncomeId = @IncomeId
-      AND UserId = @UserId
-    `);
+        categoryid = $1,
+        amount = $2,
+        description = $3,
+        incomedate = $4
+      WHERE incomeid = $5
+        AND userid = $6
+      `,
+      [CategoryId, Amount, Description, IncomeDate, incomeId, userId],
+    );
 
-    if (result.rowsAffected[0] === 0) {
+    if (result.rowCount === 0) {
       return res.status(404).json({
         success: false,
         message: "Income Not Found",
@@ -170,24 +164,24 @@ const updateIncome = async (req, res) => {
   }
 };
 
+// =========================
 // DELETE INCOME
+// =========================
 const deleteIncome = async (req, res) => {
   try {
     const userId = req.user.userId;
     const incomeId = req.params.id;
 
-    const request = new sql.Request();
+    const result = await pool.query(
+      `
+      DELETE FROM income
+      WHERE incomeid = $1
+        AND userid = $2
+      `,
+      [incomeId, userId],
+    );
 
-    request.input("IncomeId", sql.Int, incomeId);
-    request.input("UserId", sql.Int, userId);
-
-    const result = await request.query(`
-      DELETE FROM Income
-      WHERE IncomeId = @IncomeId
-      AND UserId = @UserId
-    `);
-
-    if (result.rowsAffected[0] === 0) {
+    if (result.rowCount === 0) {
       return res.status(404).json({
         success: false,
         message: "Income Not Found",

@@ -1,17 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-import dashboardService from "../../services/dashboardService";
-
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  Legend,
-} from "recharts";
+import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 
 const COLORS = [
   "#3B82F6",
@@ -22,56 +11,44 @@ const COLORS = [
   "#06B6D4",
 ];
 
-export default function CategoryPieChart() {
-  const [data, setData] = useState([]);
+export default function CategoryPieChart({ data = [] }) {
+  console.log("PIE CHART DATA:", data);
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const response = await dashboardService.getCategoryExpense();
+  const chartData = data.map((item) => ({
+    name: item.categoryname,
+    value: Number(item.totalexpense),
+  }));
 
-        setData(response);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    loadData();
-  }, []);
+  console.log("CHART DATA:", chartData);
 
   return (
-    <div className="rounded-2xl bg-white p-6 shadow-md">
-      <h2 className="mb-6 text-xl font-bold text-gray-800">
+    <div className="rounded-2xl bg-white p-6 shadow">
+      <h2 className="mb-4 text-xl font-bold text-gray-800">
         Expenses by Category
       </h2>
 
-      <div className="h-80">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={data}
-              dataKey="TotalExpense"
-              nameKey="CategoryName"
-              cx="50%"
-              cy="50%"
-              outerRadius={110}
-              label
-            >
-              {data.map((entry, index) => (
-                <Cell
-                  key={entry.CategoryName}
-                  fill={COLORS[index % COLORS.length]}
-                />
-              ))}
-            </Pie>
+      <div className="flex justify-center">
+        <PieChart width={500} height={320}>
+          <Pie
+            data={chartData}
+            dataKey="value"
+            nameKey="name"
+            cx="50%"
+            cy="50%"
+            outerRadius={100}
+            label
+          >
+            {chartData.map((entry, index) => (
+              <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Pie>
 
-            <Tooltip
-              formatter={(value) => `₹${Number(value).toLocaleString()}`}
-            />
+          <Tooltip
+            formatter={(value) => `₹${Number(value).toLocaleString()}`}
+          />
 
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
+          <Legend />
+        </PieChart>
       </div>
     </div>
   );
