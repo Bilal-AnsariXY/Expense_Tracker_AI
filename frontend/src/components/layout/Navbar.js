@@ -10,7 +10,6 @@ export default function Navbar() {
   const { user } = useSelector((state) => state.auth);
 
   const dispatch = useDispatch();
-
   const router = useRouter();
 
   const [open, setOpen] = useState(false);
@@ -38,75 +37,81 @@ export default function Navbar() {
     };
   }, []);
 
-const handleLogout = () => {
-  console.log("Logout clicked");
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
 
-  console.log("Before remove:");
-  console.log("Token:", localStorage.getItem("token"));
-  console.log("User:", localStorage.getItem("user"));
+    dispatch(logout());
 
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
+    setOpen(false);
 
-  console.log("After remove:");
-  console.log("Token:", localStorage.getItem("token"));
-  console.log("User:", localStorage.getItem("user"));
-
-  dispatch(logout());
-
-  setOpen(false);
-
-  router.replace("/");
-};
+    router.replace("/");
+  };
 
   return (
-    <header className="flex items-center justify-between border-b bg-white px-8 py-4 shadow-sm">
+    <header className="flex min-h-[80px] items-center justify-between gap-4 border-b border-gray-200 bg-white px-4 py-3 shadow-sm sm:px-6 lg:px-8">
       {/* Left */}
+      <div className="min-w-0 pl-12 md:pl-0">
+        <h2 className="truncate text-xl font-bold text-gray-800 sm:text-2xl">
+          Dashboard
+        </h2>
 
-      <div>
-        <h2 className="text-2xl font-bold text-gray-800">Dashboard</h2>
-
-        <p className="text-sm text-gray-500">{today}</p>
+        <p className="truncate text-xs text-gray-500 sm:text-sm">{today}</p>
       </div>
 
       {/* Right */}
-
-      <div ref={dropdownRef} className="relative">
+      <div ref={dropdownRef} className="relative flex-shrink-0">
         <button
           onClick={() => setOpen(!open)}
-          className="flex items-center gap-4 rounded-xl p-2 transition hover:bg-gray-100"
+          className="flex items-center gap-2 rounded-xl p-1.5 transition hover:bg-gray-100 sm:gap-4 sm:p-2"
         >
-          <div className="text-right">
-            <p className="text-sm text-gray-500">Welcome Back</p>
+          {/* User information */}
+          <div className="hidden text-right sm:block">
+            <p className="text-xs text-gray-500 sm:text-sm">Welcome Back</p>
 
-            <h3 className="font-semibold text-gray-800">
+            <h3 className="max-w-[180px] truncate font-semibold text-gray-800">
               {user?.name || "User"}
             </h3>
           </div>
 
+          {/* Profile image */}
           <img
             src={
-              user?.profilepicture || "https://ui-avatars.com/api/?name=User"
+              user?.profilepicture ||
+              `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                user?.name || "User",
+              )}`
             }
-            alt="Profile"
-            className="h-12 w-12 rounded-full border-2 border-gray-300"
+            alt={user?.name || "Profile"}
+            className="h-10 w-10 rounded-full border-2 border-gray-300 object-cover sm:h-12 sm:w-12"
           />
         </button>
 
+        {/* Dropdown */}
         {open && (
-          <div className="absolute right-0 mt-3 w-64 rounded-2xl border bg-white p-3 shadow-xl">
+          <div className="absolute right-0 top-full z-50 mt-3 w-[calc(100vw-2rem)] max-w-64 rounded-2xl border border-gray-200 bg-white p-3 shadow-xl">
             <div className="border-b pb-3">
-              <p className="font-semibold text-gray-800">{user?.name}</p>
+              <p className="truncate font-semibold text-gray-800">
+                {user?.name || "User"}
+              </p>
 
-              <p className="text-sm text-gray-500">{user?.email}</p>
+              <p className="truncate text-sm text-gray-500">
+                {user?.email || ""}
+              </p>
             </div>
 
             <div className="mt-3 space-y-2">
-              <button className="w-full rounded-lg px-4 py-3 text-left transition hover:bg-gray-100">
+              <button
+                className="w-full rounded-lg px-4 py-3 text-left transition hover:bg-gray-100"
+                onClick={() => setOpen(false)}
+              >
                 👤 Profile
               </button>
 
-              <button className="w-full rounded-lg px-4 py-3 text-left transition hover:bg-gray-100">
+              <button
+                className="w-full rounded-lg px-4 py-3 text-left transition hover:bg-gray-100"
+                onClick={() => setOpen(false)}
+              >
                 ⚙️ Settings
               </button>
 

@@ -90,15 +90,16 @@ export default function IncomeForm({ income = null, onSubmit }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {/* Category */}
-
       <div>
-        <label className="mb-2 block font-medium text-gray-700">Category</label>
+        <label className="mb-2 block text-sm font-medium text-gray-700 sm:text-base">
+          Category
+        </label>
 
         <select
           name="CategoryId"
           value={formData.CategoryId}
           onChange={handleChange}
-          className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 focus:border-blue-500 focus:outline-none"
+          className="w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-sm text-gray-900 focus:border-blue-500 focus:outline-none sm:px-4 sm:text-base"
         >
           <option value="">Select Category</option>
 
@@ -111,9 +112,10 @@ export default function IncomeForm({ income = null, onSubmit }) {
       </div>
 
       {/* Amount */}
-
       <div>
-        <label className="mb-2 block font-medium text-gray-700">Amount</label>
+        <label className="mb-2 block text-sm font-medium text-gray-700 sm:text-base">
+          Amount
+        </label>
 
         <input
           type="number"
@@ -121,14 +123,13 @@ export default function IncomeForm({ income = null, onSubmit }) {
           value={formData.Amount}
           onChange={handleChange}
           placeholder="Enter Amount"
-          className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none"
+          className="w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none sm:px-4 sm:text-base"
         />
       </div>
 
       {/* Description */}
-
       <div>
-        <label className="mb-2 block font-medium text-gray-700">
+        <label className="mb-2 block text-sm font-medium text-gray-700 sm:text-base">
           Description
         </label>
 
@@ -138,14 +139,13 @@ export default function IncomeForm({ income = null, onSubmit }) {
           value={formData.Description}
           onChange={handleChange}
           placeholder="Enter Description"
-          className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none"
+          className="w-full resize-y rounded-xl border border-gray-300 bg-white px-3 py-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none sm:px-4 sm:text-base"
         />
       </div>
 
       {/* Income Date */}
-
       <div>
-        <label className="mb-2 block font-medium text-gray-700">
+        <label className="mb-2 block text-sm font-medium text-gray-700 sm:text-base">
           Income Date
         </label>
 
@@ -154,24 +154,23 @@ export default function IncomeForm({ income = null, onSubmit }) {
           name="IncomeDate"
           value={formData.IncomeDate}
           onChange={handleChange}
-          className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 focus:border-blue-500 focus:outline-none"
+          className="w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-sm text-gray-900 focus:border-blue-500 focus:outline-none sm:px-4 sm:text-base"
         />
       </div>
 
       {/* Buttons */}
-
-      <div className="flex justify-end gap-4 pt-4">
+      <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end sm:gap-4">
         <button
           type="button"
           onClick={handleReset}
-          className="rounded-xl border border-gray-300 px-6 py-3 font-medium text-gray-700 hover:bg-gray-100"
+          className="w-full rounded-xl border border-gray-300 px-6 py-3 font-medium text-gray-700 transition hover:bg-gray-100 sm:w-auto"
         >
           Reset
         </button>
 
         <button
           type="submit"
-          className="rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700"
+          className="w-full rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700 sm:w-auto"
         >
           {income ? "Update Income" : "Save Income"}
         </button>

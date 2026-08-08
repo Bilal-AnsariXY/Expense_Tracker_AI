@@ -1,6 +1,13 @@
 "use client";
 
-import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 const COLORS = [
   "#3B82F6",
@@ -22,33 +29,53 @@ export default function CategoryPieChart({ data = [] }) {
   console.log("CHART DATA:", chartData);
 
   return (
-    <div className="rounded-2xl bg-white p-6 shadow">
-      <h2 className="mb-4 text-xl font-bold text-gray-800">
-        Expenses by Category
-      </h2>
+    <div className="w-full rounded-2xl bg-white p-4 shadow-sm sm:p-6">
+      {/* Header */}
+      <div className="mb-4">
+        <h2 className="text-xl font-bold text-gray-800 sm:text-2xl">
+          Expenses by Category
+        </h2>
+      </div>
 
-      <div className="flex justify-center">
-        <PieChart width={500} height={320}>
-          <Pie
-            data={chartData}
-            dataKey="value"
-            nameKey="name"
-            cx="50%"
-            cy="50%"
-            outerRadius={100}
-            label
-          >
-            {chartData.map((entry, index) => (
-              <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
-            ))}
-          </Pie>
+      {/* Chart */}
+      <div className="h-[300px] w-full sm:h-[350px]">
+        {chartData.length === 0 ? (
+          <div className="flex h-full items-center justify-center">
+            <p className="text-sm text-gray-500 sm:text-base">
+              No category data available.
+            </p>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={chartData}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="45%"
+                outerRadius="65%"
+                label
+              >
+                {chartData.map((entry, index) => (
+                  <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
 
-          <Tooltip
-            formatter={(value) => `₹${Number(value).toLocaleString()}`}
-          />
+              <Tooltip
+                formatter={(value) =>
+                  `₹${Number(value).toLocaleString("en-IN")}`
+                }
+              />
 
-          <Legend />
-        </PieChart>
+              <Legend
+                wrapperStyle={{
+                  fontSize: "12px",
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   );

@@ -3,10 +3,10 @@
 export default function ExpenseTable({ expenses, onEdit, onDelete }) {
   if (expenses.length === 0) {
     return (
-      <div className="rounded-2xl bg-white p-10 text-center shadow-md">
-        <h2 className="text-2xl font-semibold text-gray-700">
+      <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-800">
           No Expenses Found
-        </h2>
+        </h3>
 
         <p className="mt-2 text-gray-500">
           Start by adding your first expense.
@@ -16,58 +16,83 @@ export default function ExpenseTable({ expenses, onEdit, onDelete }) {
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl bg-white shadow-md">
-      <table className="min-w-full">
-        <thead className="bg-slate-900 text-white">
-          <tr>
-            <th className="px-6 py-4 text-left">Date</th>
+    <div className="w-full overflow-hidden rounded-2xl bg-white shadow-sm">
+      {/* Horizontal scrolling on small screens */}
+      <div className="w-full overflow-x-auto">
+        <table className="min-w-[750px] w-full text-sm">
+          <thead className="border-b bg-gray-50">
+            <tr>
+              <th className="whitespace-nowrap text-gray-700 px-4 py-4 text-left sm:px-6">
+                Date
+              </th>
 
-            <th className="px-6 py-4 text-left">Category</th>
+              <th className="whitespace-nowrap text-gray-700 px-4 py-4 text-left sm:px-6">
+                Category
+              </th>
 
-            <th className="px-6 py-4 text-left">Description</th>
+              <th className="whitespace-nowrap text-gray-700 px-4 py-4 text-left sm:px-6">
+                Description
+              </th>
 
-            <th className="px-6 py-4 text-right">Amount</th>
+              <th className="whitespace-nowrap text-gray-700 px-4 py-4 text-right sm:px-6">
+                Amount
+              </th>
 
-            <th className="px-6 py-4 text-center">Actions</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {expenses.map((expense) => (
-            <tr key={expense.ExpenseId} className="border-b hover:bg-gray-50">
-              <td className="px-6 py-4 text-gray-800">
-                {new Date(expense.ExpenseDate).toLocaleDateString()}
-              </td>
-
-              <td className="px-6 py-4 font-medium text-gray-800">
-                {expense.CategoryName}
-              </td>
-
-              <td className="px-6 py-4 text-gray-800">{expense.Description}</td>
-
-              <td className="px-6 py-4 text-right font-semibold text-red-600">
-                ₹{Number(expense.Amount).toLocaleString()}
-              </td>
-
-              <td className="space-x-2 px-6 py-4 text-center">
-                <button
-                  onClick={() => onEdit(expense)}
-                  className="rounded-lg bg-yellow-400 px-3 py-2 text-sm font-medium text-white hover:bg-yellow-500"
-                >
-                  Edit
-                </button>
-
-                <button
-                  onClick={() => onDelete(expense)}
-                  className="rounded-lg bg-red-500 px-3 py-2 text-sm font-medium text-white hover:bg-red-600"
-                >
-                  Delete
-                </button>
-              </td>
+              <th className="whitespace-nowrap text-gray-700 px-4 py-4 text-center sm:px-6">
+                Actions
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {expenses.map((expense) => (
+              <tr
+                key={expense.ExpenseId}
+                className="border-b transition hover:bg-gray-50"
+              >
+                <td className="whitespace-nowrap px-4 py-4 text-gray-800 sm:px-6">
+                  {new Date(expense.ExpenseDate).toLocaleDateString("en-IN")}
+                </td>
+
+                <td className="whitespace-nowrap px-4 py-4 font-medium text-gray-800 sm:px-6">
+                  {expense.CategoryName}
+                </td>
+
+                <td className="max-w-[250px] truncate px-4 py-4 text-gray-800 sm:px-6">
+                  {expense.Description}
+                </td>
+
+                <td className="whitespace-nowrap px-4 py-4 text-right font-semibold text-red-600 sm:px-6">
+                  ₹{Number(expense.Amount).toLocaleString("en-IN")}
+                </td>
+
+                <td className="px-4 py-4 sm:px-6">
+                  <div className="flex justify-center gap-2">
+                    <button
+                      onClick={() => onEdit(expense)}
+                      className="rounded-lg bg-yellow-400 px-3 py-2 text-sm font-medium text-white transition hover:bg-yellow-500"
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      onClick={() => onDelete(expense)}
+                      className="rounded-lg bg-red-500 px-3 py-2 text-sm font-medium text-white transition hover:bg-red-600"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile hint */}
+      <div className="border-t bg-gray-50 px-4 py-2 text-center text-xs text-gray-500 sm:hidden">
+        ← Swipe horizontally to see all columns →
+      </div>
     </div>
   );
 }

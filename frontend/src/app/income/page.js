@@ -23,9 +23,7 @@ export default function IncomePage() {
   const { income, loading, error } = useSelector((state) => state.income);
 
   const [search, setSearch] = useState("");
-
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [selectedIncome, setSelectedIncome] = useState(null);
 
   useEffect(() => {
@@ -40,6 +38,7 @@ export default function IncomePage() {
 
       dispatch(setIncome(response));
     } catch (error) {
+      console.error(error);
       dispatch(incomeError(error.message));
     }
   }
@@ -72,7 +71,6 @@ export default function IncomePage() {
 
   function handleEdit(item) {
     setSelectedIncome(item);
-
     setIsModalOpen(true);
   }
 
@@ -87,29 +85,42 @@ export default function IncomePage() {
   }
 
   const filteredIncome = income.filter((item) =>
-    item.Description.toLowerCase().includes(search.toLowerCase()),
+    item.Description?.toLowerCase().includes(search.toLowerCase()),
   );
 
   if (loading) {
-    return <div className="p-8 text-xl text-black font-semibold">Loading Income...</div>;
+    return (
+      <div className="flex min-h-[300px] items-center justify-center">
+        <p className="text-gray-500">Loading Income...</p>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="p-8 text-red-600">{error}</div>;
+    return <div className="rounded-xl bg-red-50 p-4 text-red-600">{error}</div>;
   }
 
   return (
-    <>
-      <div className="space-y-8 p-8">
-        <PageHeader
-          title="Income"
-          subtitle="Manage all your income."
-          buttonText="+ Add Income"
-          onButtonClick={openModal}
-        />
+    <div className="w-full space-y-6">
+      {/* Page Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <PageHeader title="Income" description="Track and manage your income" />
 
+        <button
+          onClick={openModal}
+          className="w-full rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700 sm:w-auto"
+        >
+          + Add Income
+        </button>
+      </div>
+
+      {/* Search */}
+      <div className="w-full">
         <SearchIncome search={search} setSearch={setSearch} />
+      </div>
 
+      {/* Income Table */}
+      <div className="w-full overflow-hidden rounded-2xl">
         <IncomeTable
           income={filteredIncome}
           onEdit={handleEdit}
@@ -117,6 +128,7 @@ export default function IncomePage() {
         />
       </div>
 
+      {/* Add/Edit Income Modal */}
       <IncomeModal
         isOpen={isModalOpen}
         title={selectedIncome ? "Edit Income" : "Add Income"}
@@ -124,6 +136,6 @@ export default function IncomePage() {
       >
         <IncomeForm income={selectedIncome} onSubmit={handleSubmit} />
       </IncomeModal>
-    </>
+    </div>
   );
 }
